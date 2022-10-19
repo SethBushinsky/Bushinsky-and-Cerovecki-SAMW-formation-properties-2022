@@ -2,7 +2,7 @@
 
 Processing and plotting script associated with: "Subantarctic Mode Water Biogeochemical Formation Properties and Interannual Variability", Seth M. Bushinsky<sup>1</sup> and Ivana Cerovecki<sup>2</sup>
 
-<sup>1</sup>Department of Oceanography, School of Ocean and Earth Science and Technology, University of Hawai'i at Manoa, Honolulu, HI 
+<sup>1</sup>Department of Oceanography, School of Ocean and Earth Science and Technology, University of Hawai'i at Manoa, Honolulu, HI  
 <sup>2</sup>Scripps Institution of Oceanography, University of California San Diego, La Jolla, CA
 
 Corresponding author: Seth Bushinsky (seth.bushinsky@hawaii.edu)
