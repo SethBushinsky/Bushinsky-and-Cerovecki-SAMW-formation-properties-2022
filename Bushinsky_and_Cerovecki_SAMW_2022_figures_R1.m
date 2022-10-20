@@ -1490,9 +1490,9 @@ print(gcf, '-dpdf', '-r800',  [plot_dir plot_filename '.pdf'])
 % % updating with new files from Ivana - 2021_12_13
 % % need to run sose data load from Fig 2 first
 % 
-% bSOSE_out.CPac = load([cerovecki_dir '/Data_from_Ivana/2021_12_10/' 'b135_BIN_MLD_CPac_1_511_dR025_ST_mask_200_45_64_170_246_SAMW_TS_updated.mat']);
-% bSOSE_out.SEPac = load([cerovecki_dir '/Data_from_Ivana/2021_12_10/' 'b135_BIN_MLD_SEPac_1_511_dR025_ST_mask_200_45_64_246_290_SAMW_TS_updated.mat']);
-% bSOSE_out.Pac = load([cerovecki_dir '/Data_from_Ivana/2021_12_10/' 'b135_BIN_MLD_Pac_1_511_dR025_ST_mask_200_45_64_170_290_SAMW_TS_updated.mat']);
+bSOSE_out.CPac = load([cerovecki_dir '/Data_from_Ivana/2021_12_10/' 'b135_BIN_MLD_CPac_1_511_dR025_ST_mask_200_45_64_170_246_SAMW_TS_updated.mat']);
+bSOSE_out.SEPac = load([cerovecki_dir '/Data_from_Ivana/2021_12_10/' 'b135_BIN_MLD_SEPac_1_511_dR025_ST_mask_200_45_64_246_290_SAMW_TS_updated.mat']);
+bSOSE_out.Pac = load([cerovecki_dir '/Data_from_Ivana/2021_12_10/' 'b135_BIN_MLD_Pac_1_511_dR025_ST_mask_200_45_64_170_290_SAMW_TS_updated.mat']);
 % 
 % reg_names = fieldnames(bSOSE_out);
 % 
