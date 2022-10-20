@@ -1,9 +1,9 @@
 # Bushinsky-and-Cerovecki-SAMW-formation-properties-2022
 
-Processing and plotting script associated with: "Subantarctic Mode Water Biogeochemical Formation Properties and Interannual Variability", Seth M. Bushinsky1 and Ivana Cerovecki2
+Processing and plotting script associated with: "Subantarctic Mode Water Biogeochemical Formation Properties and Interannual Variability", Seth M. Bushinsky<sup>1</sup> and Ivana Cerovecki<sup>2</sup>
 
-1Department of Oceanography, School of Ocean and Earth Science and Technology, University of Hawai'i at Manoa, Honolulu, HI 
-2Scripps Institution of Oceanography, University of California San Diego, La Jolla, CA
+<sup>1</sup>Department of Oceanography, School of Ocean and Earth Science and Technology, University of Hawai'i at Manoa, Honolulu, HI  
+<sup>2</sup>Scripps Institution of Oceanography, University of California San Diego, La Jolla, CA
 
 Corresponding author: Seth Bushinsky (seth.bushinsky@hawaii.edu)
 
@@ -16,8 +16,8 @@ Data files needed (see manuscript for detailed citations):
 - Glodapv2.2020_Merged_Master_File.mat - https://www.glodap.info/index.php/merged-and-adjusted-data-product/ 
 - SOCATv2021 Southern Oceans- https://www.socat.info/index.php/data-access/, read and processed using code (Read_SOCATv3_v2021.m) available from the same page.  SOCAT data quality flags ABCD and WOCE QC flag 2. 
 - co2_GHGreference.901469012_surface.txt - https://gml.noaa.gov/ccgg/mbl/data.php. Surface data from 1979-01–01 to 2020-01-01.
-- MLD_av_2005_OCT_2021_SouthOc.mat - Monthly 1x1 gridded MLDs from core Argo data. 
-- MW_Vol_RG_Argo20[05-21]_All_Densities_updated.mat - monthly MW volumes binned by density on a 1x1 deg grid.
+- MLD_av_2005_OCT_2021_SouthOc.mat - Monthly 1x1 gridded MLDs from core Argo data; included in Data/ 
+- MW_Vol_RG_Argo20[05-21]_All_Densities_updated.mat - monthly MW volumes binned by density on a 1x1 deg grid; included in Data/
 
 
 ____
@@ -26,8 +26,13 @@ Plotting script: Bushinsky_and_Cerovecki_SAMW_2022_figures_R1.m
 
 Data files needed: 
 
-regional_boundaries_5zone.mat - SO Front boundaries as defined/used in Gray et al. 2018 and Bushinsky et al. 2019
-- included in Subfunctions/
+- regional_boundaries_5zone.mat - SO Front boundaries as defined/used in Gray et al. 2018 and Bushinsky et al. 2019; included in Data/
+- sam_nino_2005_2021.mat - Monthly SAM and ENSO indices; included in Data/
+- BSOSE output for figures (included in Data/): 
+  - MLD_AnAv_SAMW_range8_9_SEPac_200_m_025_ST_iter135_45_64_246_290_se_pacific.mat
+  - b135_BIN_MLD_CPac_1_511_dR025_ST_mask_200_45_64_170_246_SAMW_TS_updated.mat
+  - b135_BIN_MLD_Pac_1_511_dR025_ST_mask_200_45_64_170_290_SAMW_TS_updated.mat
+  - b135_BIN_MLD_SEPac_1_511_dR025_ST_mask_200_45_64_246_290_SAMW_TS_updated.mat
 
 Colormaps: 
 - ColorBrewer - https://www.mathworks.com/matlabcentral/fileexchange/45208-colorbrewer-attractive-and-distinctive-colormaps
