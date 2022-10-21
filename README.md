@@ -30,9 +30,7 @@ Data files needed:
 - sam_nino_2005_2021.mat - Monthly SAM and ENSO indices; included in Data/
 - BSOSE output for figures (included in Data/): 
   - MLD_AnAv_SAMW_range8_9_SEPac_200_m_025_ST_iter135_45_64_246_290_se_pacific.mat
-  - b135_BIN_MLD_CPac_1_511_dR025_ST_mask_200_45_64_170_246_SAMW_TS_updated.mat
-  - b135_BIN_MLD_Pac_1_511_dR025_ST_mask_200_45_64_170_290_SAMW_TS_updated.mat
-  - b135_BIN_MLD_SEPac_1_511_dR025_ST_mask_200_45_64_246_290_SAMW_TS_updated.mat
+  - BSOSE_iter135_[DIC,NO3,O2]_2013_2019_SouthOc_MLD_150m_AugSep_BSOSE_mask_v2.mat
 
 Colormaps: 
 - ColorBrewer - https://www.mathworks.com/matlabcentral/fileexchange/45208-colorbrewer-attractive-and-distinctive-colormaps
