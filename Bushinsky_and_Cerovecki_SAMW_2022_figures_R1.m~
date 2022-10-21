@@ -1485,7 +1485,7 @@ clear all_pos c1 c1_pos c_lims c_map color_map_names colormap data1 enso_sm hax 
 clear plot_filename plot_index pp R sam_sm y_ind y_offset yy lat_map lon_map
 clear time temp_time temp reg_index reg_names cmap
 
-%% Fig 7: bSOSE IAV
+%% Fig 7:
 bSOSE_anav = load([cerovecki_dir '/Data_from_Ivana/2021_12_10/MLD_AnAv_SAMW_range8_9_SEPac_200_m_025_ST_iter135_45_64_246_290_se_pacific.mat']);
 bsose_fields = fieldnames(bSOSE_anav);
 reg_names = {'samw_c_pacific' 'samw_se_pacific' 'samw_pacific'};
@@ -1573,7 +1573,7 @@ set(l1, 'position', l1_pos+[.01 .01 0 0])
 
 print(gcf, '-dpdf', '-r800',  [plot_dir plot_filename '.pdf'])
 
-clear l1 l1_pos x1 prop_name l_n prop_unit plot_count r s plot_colors x  
+clear l1 l1_pos x1 prop_name l_n prop_unit plot_count r s plot_colors plot_symbols x reg_names bsose_fields
 %% Supplemental Figures
 
 %% Fig S1 - SAMW formation properties and volume vs. density
@@ -1655,7 +1655,7 @@ set(d(4), 'ytick', 370:30:460)
 
 print(gcf, '-dpdf', '-r800', [plot_dir plot_filename '.pdf' ])
 
-clear pcol d plot_number pl lon_lims lat_lims paper_w paper_h plot_lims plot_map
+clear pcol d plot_number pl lon_lims lat_lims paper_w paper_h plot_colors plot_lims plot_map
 clear r 
 %% Crossover comparisons for Figure S2
 
@@ -1817,7 +1817,7 @@ end
 
 clear explore_plots temp_expocode DATA ArgALK_CO2sys Press_CO2sys temp_pCO2 temp_sal temp_sst
 clear temp_lon temp_lat filt_temp_lon filt_temp_lon_mean lon_temp_argo lon_temp_socat
-clear clear socat_dist f time_match ArgSST_CO2sys 
+clear clear socat_dist f time_match A
 %% creating the difference table
 match_SNs = fieldnames(Argo_socat_dist);
 diff_table = NaN(150,17);
@@ -1945,9 +1945,6 @@ clear d2 h2 orig_x_lim d1
 % updating w/ new data to see if relationship still holds
 % run Fig 2 and Fig 6 first to load needed data
 % also fig 3 processing if you end up overlaying obs on this
-plot_colors = brewermap(3, 'Set1');
-plot_colors (3,:) = [0 0 0];
-
 
 plot_filename = 'Fig_S3_bSOSE o2_T_v3';
 clf
@@ -1969,7 +1966,9 @@ for r = 1:size(reg_names,2)
     
     y = bSOSE_anav.(bsose_fields{reg_index(3)});
     x = bSOSE_anav.(bsose_fields{reg_index(5)});
-   
+    
+    %     x = bSOSE_out.(reg_names{q}).(var_names{5,q})';
+    %     y = bSOSE_out.(reg_names{q}).(var_names{3,q})';
     
     l_n(r) = plot(x, y, plot_symbols{r}, 'linewidth',2, 'color', plot_colors(r,:));
     
@@ -1985,14 +1984,18 @@ set(gca, 'xlim', [4.5 8.7], 'fontsize', 13)%, 'ylim', [280 304])
 
 xlabel('\theta (\circC)')
 ylabel('[O_2] (\mumol kg^-^1)');
-set(gcf, 'renderer', 'painters')
+
 % l1 = legend(l_n, 'BSOSE C Pac', 'BSOSE SE Pac', 'BSOSE Pac', 'Argo Pac', '[O_2]_s_a_t',  ['[O_2]_s_a_t x' '$\frac{SLP}{1013.25}$'], 'location', 'northeast', 'interpreter', 'latex');
 % legend('$\frac{SLP}{1013.25}$')
 l1 = legend(l_n, 'BSOSE C Pac', 'BSOSE SE Pac', 'BSOSE Pac', 'Argo Pac', '$[O_2]_{sat}$', '$[O_2]_{sat}\times\frac{\overline{SLP}}{1013.25}$','Interpreter','latex', 'fontsize', 14);
 print(gcf, '-dpdf', '-r800',  [plot_dir plot_filename '.pdf'])
 
-clear l1 l_n r x y reg_index x_temps calc_sol
 %% Figure S4
+
+% dir_my_scripts=['/data1/project/gyre/BSOSE/scripts/iter135/Hovmuller/'];
+% data_mm=['/data2/project/gyre-data/BSOSE/iter135/MonthMean_NEW/'];
+
+% cd(data_mm)
 
 hov_props = {'DIC' 'NO3' 'O2'};
 hov_prop_titles = {'[DIC] anomaly' '[NO_3^-] anomaly' '[O_2] anomaly'};
