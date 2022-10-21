@@ -11,6 +11,7 @@
 % Load float data
 float_data_dir = [data_dir 'ARGO_O2_Floats/Global/SOCCOM/2021_05_05_Snapshot_LoRes_LIAR/'];
 float_data_filename = 'SO_calc_09-Mar-2022_w_calc_param_pco2_W14_wCalcs.mat'; % 0.03 MLD cutoff - % updated with fully QC'd dataset
+disp('loading Argo')
 load([float_data_dir float_data_filename])
 
 cerovecki_dir = [home_dir 'Work/Projects/2020_02 SO SAMW Variability_Cerovecki/'];
@@ -1021,7 +1022,7 @@ for r = 1:length(regions)
 end
 clear r
 clear lat_index
-%%
+%
 
 % finding binned mode water volume percentages from the wintertime months used in this
 % study
@@ -1052,7 +1053,7 @@ for r = 1:length(regions)
 clear per_5_temp
 end
 clear r month 
-%%
+%
 % save the mean value in mode water volumes that are greater than 5 %
 % currently "hard coded" values for month range and density bins
 for r = 1:length(regions)
@@ -1125,36 +1126,6 @@ for r = 1:length(regions)
     clear sig_thet_range p y month
 end
 clear r
-%%
-
-% % % annual climatology of mw properties:
-% % for r = 1:2
-% %     for p=1:length(properties)
-% %         mw_prop.(regions{r}).annual_climatology.(properties{p}) = NaN(12,2);
-% %     end
-% % end
-% % 
-% % for r = 1:2
-% % %     sig_thet_range = mode_vol.y2005.sig_th(mw_prop.(regions{r}).all.per_5_index);
-% %     
-% %     
-% %     for month=1:12
-% %         argo_index =store_argo.(regions{r}).ml_pdens-1000>=mw_prop.(regions{r}).all.sig_thet_range(1) & ...
-% %             store_argo.(regions{r}).ml_pdens-1000<mw_prop.(regions{r}).all.sig_thet_range(end) ...
-% %             & store_argo.(regions{r}).month==month & store_argo.(regions{r}).MLD>MLD_cutoff;
-% %         
-% %         for p = 1:length(properties)
-% %             mw_prop.(regions{r}).annual_climatology.(properties{p})(month, 1) = nanmean(store_argo.(regions{r}).(properties{p})(argo_index));
-% %             mw_prop.(regions{r}).annual_climatology.(properties{p})(month, 2) = nanstd(store_argo.(regions{r}).(properties{p})(argo_index));
-% %             
-% %         end
-% %     end
-% % end
-% % 
-% % clear p r s month lat_lims lon_lims argo_index
-
-%% comparison to Carter et al. 2021 properties
-% carter = load([cerovecki_dir 'Carter preformed properties/PreformedPropertiesDefault_v1.mat']);
 
 %% Carter et al. 2014 comparison:
 % Use nitrate difference and redfield to estimate equivalent DIC and Alk
@@ -1183,3 +1154,4 @@ carter.carter_pCO2_orig = (DATA(:,19));
 
 carter.carter_pCO2_new = (DATA(:,19));
 
+clear DATA
