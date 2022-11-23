@@ -12,7 +12,7 @@ ___
 Processing script: Bushinsky_and_Cerovecki_SAMW_2022_R1.m
 
 Data files needed (see manuscript for detailed citations):
-- SO_calc_09-Mar-2022_w_calc_param_pco2_W14_wCalcs.mat - May 2021 SOCCOM Snapshot (doi.org/10.6075/J0T43SZG ) plus Drucker and Riser 2016 UW Oxygen dataset (https://argo.ucsd.edu/data/data-from-gdacs/ ). Secondary QC performed. Calculations of potential density, pot. temperature, MLD. Other calculated parameters are included but not used in this analysis. https://www.dropbox.com/s/5wasxkdf7zgvdyk/SO_calc_09-Mar-2022_w_calc_param_pco2_W14_wCalcs.mat?dl=0 
+- SO_calc_09-Mar-2022_w_calc_param_pco2_W14_wCalcs.mat - May 2021 SOCCOM Snapshot (doi.org/10.6075/J0T43SZG ) plus Drucker and Riser 2016 UW Oxygen dataset (https://argo.ucsd.edu/data/data-from-gdacs/ ). Secondary QC performed. Calculations of potential density, pot. temperature, MLD. Other calculated parameters are included but not used in this analysis. Included in Data/
 - Glodapv2.2020_Merged_Master_File.mat - https://www.glodap.info/index.php/merged-and-adjusted-data-product/ 
 - SOCATv2021 Southern Oceans- https://www.socat.info/index.php/data-access/, read and processed using code (Read_SOCATv3_v2021.m) available from the same page.  SOCAT data quality flags ABCD and WOCE QC flag 2. 
 - co2_GHGreference.901469012_surface.txt - https://gml.noaa.gov/ccgg/mbl/data.php. Surface data from 1979-01–01 to 2020-01-01.
@@ -28,10 +28,12 @@ Data files needed:
 
 - regional_boundaries_5zone.mat - SO Front boundaries as defined/used in Gray et al. 2018 and Bushinsky et al. 2019; included in Data/
 - sam_nino_2005_2021.mat - Monthly SAM and ENSO indices; included in Data/
+- PreformedPropertiesDefault_v1.mat - Data from Carter et al. 2021 - https://github.com/BRCScienceProducts/PreformedPropertyEstimates
 - BSOSE output for figures (included in Data/): 
   - MLD_AnAv_SAMW_range8_9_SEPac_200_m_025_ST_iter135_45_64_246_290_se_pacific.mat
   - BSOSE_iter135_[DIC,NO3,O2]_2013_2019_SouthOc_MLD_150m_AugSep_BSOSE_mask_v2.mat
-
+  - MLDanom_Timav_mo_8_9_yrs_2013_2019_iter135_SouthOc_mask_200_35_64.mat
+  
 Colormaps: 
 - ColorBrewer - https://www.mathworks.com/matlabcentral/fileexchange/45208-colorbrewer-attractive-and-distinctive-colormaps
 - Other colormaps from: https://www.mathworks.com/matlabcentral/fileexchange/51986-perceptually-uniform-colormaps . Ander Biguri (2022). Perceptually uniform colormaps (https://www.mathworks.com/matlabcentral/fileexchange/51986-perceptually-uniform-colormaps), MATLAB Central File Exchange. 
