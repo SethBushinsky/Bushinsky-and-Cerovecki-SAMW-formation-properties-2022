@@ -847,7 +847,7 @@ for r=1:2
 end
 
 clear r p ds
-
+SNs_out = [];
 for yy = 1:length(year_range)
     for mon = 1:12
         temp_filt.GMT_Matlab((yy-1)*12+mon) = datenum(year_range(yy), mon, 15);
@@ -873,6 +873,10 @@ for yy = 1:length(year_range)
                 end
                 temp_filt.(regions{r}).argo.(properties{p})((yy-1)*12+mon,1) = nanmean(store_argo.(regions{r}).(properties{p})(argo_index));
                 temp_filt.(regions{r}).argo.(properties{p})((yy-1)*12+mon,2) = nanstd(store_argo.(regions{r}).(properties{p})(argo_index));
+                
+                if p==2
+                    SNs_out = [SNs_out; store_argo.(regions{r}).float_SN(argo_index)]; % list of SNs used in delta O2 calculation 
+                end
                 
                 if p~=2 && p~=1 && p~=15
                     socat_index = store_socat.(regions{r}).ml_pdens-1000>=mw_prop.(regions{r}).all.sig_thet_range(1) &  ...
@@ -1296,7 +1300,7 @@ for pp = 1:length(bsose_props)
     
     clf
     set(gcf, 'units', 'inches')
-    paper_w = 9; paper_h =8.7;
+    paper_w = 9; paper_h =9.7;
     
     coast = load('coast');
     % colormap = inferno;
@@ -1367,7 +1371,7 @@ for pp = 1:length(bsose_props)
         if yy==1
             title(bsose_prop_names{pp},'fontsize', 16)
         end
-        text(-.65,-.83, num2str(bsose_years(yy)), 'fontsize', 14)
+        text(-.65,-.83, num2str(bsose_years(yy)), 'fontsize', 15)
         % text(-1.1, 1.1, [' Months: ' num2str(month_lims_for_mean(1)) ' to ' num2str(month_lims_for_mean(2))], 'fontsize', 15)
     end
     %
@@ -1391,8 +1395,8 @@ for pp = 1:length(bsose_props)
     set(ph(yy), 'position', all_pos(yy,:)+[-0.1 y_offset m_scale m_scale])
 
     c1_pos = get(c1, 'position');
-    set(c1, 'position', c1_pos+[0 0.008 0 0])
     
+    set(c1, 'position', c1_pos+[0.1 0.008 -0.2 0], 'fontsize', 12)
     print(gcf, '-dpdf', '-r800',  [plot_dir plot_filename 'w_colorbar.pdf'])
     
 end
@@ -1657,7 +1661,202 @@ print(gcf, '-dpdf', '-r800', [plot_dir plot_filename '.pdf' ])
 
 clear pcol d plot_number pl lon_lims lat_lims paper_w paper_h plot_lims plot_map
 clear r 
-%% Crossover comparisons for Figure S2
+
+%% Fig S2 - BSOSE float bgc difference evaluation
+
+clear bsose_comp
+
+BSOSE_dir = [data_dir 'Model_Output/SOSE/2013-2019_ITER135_1_6deg/'];
+
+viz_files = dir([BSOSE_dir 'VIZ*.nc']);
+for f = 1:length(viz_files)
+    file_info = ncinfo([BSOSE_dir viz_files(f).name]);
+    
+    for v = 1:length(file_info.Variables)
+        bsose_comp(f).year.(file_info.Variables(v).Name) = ncread([BSOSE_dir viz_files(f).name], file_info.Variables(v).Name);
+    end
+end
+
+clear f v
+%%
+clear var_diff
+comp_vars = {'prof_T'; 'prof_S'; 'prof_O2'; 'prof_NO3'; 'prof_DIC'};
+
+for cv = 1:length(comp_vars)
+    var_diff.(comp_vars{cv}) = [];
+end
+var_diff.prof_date = [];
+var_diff.MLD = [];
+var_diff.prof_lat = [];
+var_diff.prof_lon = [];
+
+% calculate differences for each year, concatenate into a single array for
+% each variable
+for f = 1:length(viz_files)
+    for cv = 1:length(comp_vars)
+        temp_var = bsose_comp(f).year.(comp_vars{cv}) - bsose_comp(f).year.([comp_vars{cv} 'estim']);
+        var_diff.(comp_vars{cv}) = cat(2, var_diff.(comp_vars{cv}), temp_var);
+        
+    end
+    % add datetime vectors
+    var_diff.prof_date = [var_diff.prof_date ; bsose_comp(f).year.prof_date];
+    var_diff.prof_lat = [var_diff.prof_lat ; bsose_comp(f).year.prof_lat];
+    var_diff.prof_lon = [var_diff.prof_lon ; bsose_comp(f).year.prof_lon];
+    
+    temp_MLD = NaN(length(bsose_comp(f).year.prof_date),1);
+    % calculate MLDs
+    for p = 1:size(bsose_comp(f).year.(comp_vars{cv}),2)
+        temp_MLD(p) = ...
+            mld_dbm(bsose_comp(f).year.prof_Testim(:,p), ...
+            bsose_comp(f).year.prof_Sestim(:,p), ...
+            bsose_comp(f).year.prof_depth, 1);
+    end
+    var_diff.MLD = [var_diff.MLD ; temp_MLD];
+
+
+end
+
+clear cv f temp_var
+
+var_diff.date_vec = datevec(var_diff.prof_date);
+var_diff.prof_lon(var_diff.prof_lon<0) = var_diff.prof_lon(var_diff.prof_lon<0)+360;
+
+%% calculate binned means
+
+% split by region:
+for r = 1:3
+    
+    
+    if r==1
+        var_date_ind = (var_diff.prof_lat>geo_lims.lat_lims_pac(1) & var_diff.prof_lat<geo_lims.lat_lims_pac(2) & ...
+            var_diff.prof_lon>=geo_lims.pac_lims(1) & var_diff.prof_lon<geo_lims.pac_lims(2)) & ...
+            sum(var_diff.date_vec(:,2)==month_lims_for_mean,2)==1 & var_diff.MLD>=200;
+        region_name = regions{r};
+        
+    elseif r==2
+        var_date_ind = (var_diff.prof_lat>geo_lims.lat_lims_ind(1) & var_diff.prof_lat<geo_lims.lat_lims_ind(2) & ...
+            var_diff.prof_lon>=geo_lims.ind_lims(1) & var_diff.prof_lon<geo_lims.ind_lims(2)) & ...
+            sum(var_diff.date_vec(:,2)==month_lims_for_mean,2)==1 & var_diff.MLD>=200;
+        region_name = regions{r};
+    else
+        var_date_ind = sum(var_diff.date_vec(:,2)==month_lims_for_mean,2)==1 & var_diff.MLD>=200;
+        region_name = 'all';
+        
+    end
+    
+    
+    
+    % 
+    
+    % vertical binning
+    bin_size = 25;
+    var_diff.press_bins = 0:bin_size:2000;
+    var_diff.press_bins = var_diff.press_bins';
+    
+    for cv = 1:length(comp_vars)
+        var_diff.bin.(region_name).(comp_vars{cv}) = NaN(length(var_diff.press_bins),2);
+        
+        if strcmp(comp_vars{cv}, 'prof_DIC') ...
+                || strcmp(comp_vars{cv}, 'prof_NO3') ...
+                || strcmp(comp_vars{cv}, 'prof_O2')
+            scale = 1000/1.0245;
+        else
+            scale=1;
+        end
+        
+        for d = 1:length(var_diff.press_bins)-1
+            var_depth_ind = bsose_comp(1).year.prof_depth> var_diff.press_bins(d) ...
+                & bsose_comp(1).year.prof_depth<= var_diff.press_bins(d+1);
+            
+            temp_var = var_diff.(comp_vars{cv})(var_depth_ind,var_date_ind).*scale;
+            var_diff.bin.(region_name).(comp_vars{cv})(d,1) = nanmean(reshape(temp_var,[],1));
+            var_diff.bin.(region_name).(comp_vars{cv})(d,2) = (nanmean((reshape(temp_var,[],1)).^2)).^0.5; %rmse
+            
+        end
+    end
+end
+
+%% plot
+% var_filt = sum(var_diff.date_vec(:,2)==month_lims_for_mean,2)==1;
+
+for r = 1:2
+    
+    if        r<3
+        region_name = regions{r};
+    else
+        region_name = 'all';
+    end
+    clf
+    set(gcf, 'units', 'inches')
+    paper_w = 13; paper_h =6;
+    set(gcf,'PaperSize',[paper_w paper_h],'PaperPosition', [0 0 paper_w paper_h]);
+    
+    for cv = 1:length(comp_vars)
+        subplot(1,5,cv)
+        hold on
+        
+        
+        if strcmp(comp_vars{cv}, 'prof_DIC') ...
+                || strcmp(comp_vars{cv}, 'prof_NO3') ...
+                || strcmp(comp_vars{cv}, 'prof_O2')
+            scale = 1000;
+            units = '\mumol kg^-^1';
+            
+        elseif strcmp(comp_vars{cv}, 'prof_T')
+            scale=1;
+            units = '\circC';
+        elseif strcmp(comp_vars{cv}, 'prof_S')
+            scale=1;
+            
+            units = 'PSS';
+        end
+        
+        if cv==1
+            x_lims = [-3 2];
+        elseif cv==2
+            x_lims = [-0.4 .3];
+        elseif cv==3
+            x_lims = [-45 30];
+        elseif cv==4
+            x_lims = [-5 5];
+        elseif cv==5
+            x_lims = [-20 20];
+        end
+        
+        
+        %     var_mean = nanmean(var_diff.(comp_vars{cv})(:,var_filt).*scale,2);
+        %     var_std = nanstd((var_diff.(comp_vars{cv})(:,var_filt).*scale)')';
+        %
+        %     boundedline( var_mean,  bsose_comp(1).year.prof_depth, var_std, 'orientation', 'horiz')
+        set(gca, 'ydir', 'reverse', 'ylim', [0 200], 'xlim', x_lims)
+        plot([0 0], [0 2000], '--k', 'linewidth', 1)
+        
+        errorbar(var_diff.bin.(region_name).(comp_vars{cv})(:,1), var_diff.press_bins+bin_size./2, ...
+            var_diff.bin.(region_name).(comp_vars{cv})(:,2), 'horizontal', 'linewidth', 2)
+        
+        xlabel(units)
+        if cv==1
+        ylabel('Depth')
+        end
+        %calculate each profile average error in the top 200m
+        
+        %     all_prof = nanmean(var_diff.(comp_vars{cv})(:,var_filt).*scale,1);
+        prof_avg = nanmean(var_diff.bin.(region_name).(comp_vars{cv})(var_diff.press_bins<=200,1));
+        
+        %     prof_rmse = (nanmean(var_diff.bin.(comp_vars{cv})(var_diff.press_bins<=200,1).^2)).^0.5
+        prof_rmse = nanmean(var_diff.bin.(region_name).(comp_vars{cv})(var_diff.press_bins<=200,2));
+        
+        title([comp_vars{cv}(6:end) ': ' num2str(prof_avg,2) ' \pm ' num2str(prof_rmse,3)])
+        set(gca, 'fontsize', 14)
+        
+    end
+    
+    
+    plot_filename = ['Fig_S2_BSOSE_VIZ_prof_diff_plot_' region_name];
+    
+    print(gcf, '-dpdf', '-r800',  [plot_dir plot_filename '_v2.pdf'])
+end
+%% Crossover comparisons for Figure S3
 
 %% pre-calculate SOCAT distance
 Argo_socat_dist = [];
@@ -1873,8 +2072,8 @@ for f=1:length(match_SNs)
 end
 
 clear mathed_profiles argo_match_depths f q 
-%% Figure S2 
-plot_filename = ['Fig_S2_SOCAT_Float_1_to_1_SOCATv2020prelim_AB ' num2str(day_range) ' days and '  num2str(distance_range) ' km SST Corr ' pCO2_type];
+%% Figure S3 
+plot_filename = ['Fig_S3_SOCAT_Float_1_to_1_SOCATv2020_AB ' num2str(day_range) ' days and '  num2str(distance_range) ' km SST Corr ' pCO2_type];
 plasma_map = plasma;
 
 clf
@@ -1941,7 +2140,7 @@ print(gcf,'-dpdf', '-r800', [plot_dir plot_filename 'density_comp ' num2str(dens
 
 
 clear d2 h2 orig_x_lim d1
-%% Figure S3 - bSOSE O2 vs. T w/ o2 solubility overlaid
+%% Figure S4 - bSOSE O2 vs. T w/ o2 solubility overlaid
 % updating w/ new data to see if relationship still holds
 % run Fig 2 and Fig 6 first to load needed data
 % also fig 3 processing if you end up overlaying obs on this
@@ -1949,7 +2148,7 @@ plot_colors = brewermap(3, 'Set1');
 plot_colors (3,:) = [0 0 0];
 
 
-plot_filename = 'Fig_S3_bSOSE o2_T_v3';
+plot_filename = 'Fig_S4_bSOSE o2_T_v3';
 clf
 
 set(gcf, 'units', 'inches')
@@ -1992,7 +2191,7 @@ l1 = legend(l_n, 'BSOSE C Pac', 'BSOSE SE Pac', 'BSOSE Pac', 'Argo Pac', '$[O_2]
 print(gcf, '-dpdf', '-r800',  [plot_dir plot_filename '.pdf'])
 
 clear l1 l_n r x y reg_index x_temps calc_sol
-%% Figure S4
+%% Figure S5 - Hovmouller plots
 
 hov_props = {'DIC' 'NO3' 'O2'};
 hov_prop_titles = {'[DIC] anomaly' '[NO_3^-] anomaly' '[O_2] anomaly'};
@@ -2006,7 +2205,7 @@ c_lims = [10 ; 2; 15];
 
 for q=1:3
 
-plot_filename = ['Fig_S4_bsose_hovmuller_anomalies_' hov_props{q} '_v1' ];
+plot_filename = ['Fig_S5_bsose_hovmuller_anomalies_' hov_props{q} '_v1' ];
 
 clf
 set(gcf, 'units', 'inches')
@@ -2065,3 +2264,105 @@ set(gca,'xtick',[150:30:300]);set(gca,'xticklabel',{'150E';' 180';' 150W';'120W'
 
 print(gcf, '-dpdf', '-r800',  [plot_dir plot_filename 'w_colorbar.pdf'])
 end
+
+%% Comparison to Carter et al. 2021 properties
+carter = load([cerovecki_dir 'Carter preformed properties/PreformedPropertiesDefault_v1.mat']);
+
+depth_index = carter.Depth==200;
+
+[carter.lon_grid, carter.lat_grid] = meshgrid(carter.Longitude, carter.Latitude);
+
+temp_carter_o2 = carter.pO(:,:, depth_index);
+temp_carter_no3 = carter.pN(:,:, depth_index);
+
+temp_lon_carter = carter.lon_grid';
+temp_lat_carter = carter.lat_grid';
+
+% carter_lat_index = temp_lat_carter<=max(argo_MLD.LAT(1,:));
+carter_lat_index_1 = temp_lat_carter<=max(argo_MLD.LAT(1,:));
+carter_lat_index_2 = temp_lat_carter>=min(argo_MLD.LAT(1,:));
+carter_lat_index = carter_lat_index_1 & carter_lat_index_2;
+
+temp_lat_carter = temp_lat_carter(:,carter_lat_index(1,:));
+temp_lon_carter = temp_lon_carter(:,carter_lat_index(1,:));
+temp_carter_o2 = temp_carter_o2(:,carter_lat_index(1,:));
+temp_carter_no3 = temp_carter_no3(:,carter_lat_index(1,:));
+
+temp_lon_carter_shifted = NaN(size(temp_lon_carter));
+temp_lat_carter_shifted = NaN(size(temp_lon_carter));
+temp_o2_carter_shifted = NaN(size(temp_lon_carter));
+temp_no3_carter_shifted = NaN(size(temp_lon_carter));
+
+temp_lon_carter_shifted(1:20,:) = temp_lon_carter(341:end,:)-360;
+temp_lon_carter_shifted(21:end,:) = temp_lon_carter(1:340,:);
+
+temp_lat_carter_shifted(1:20,:) = temp_lat_carter(341:end,:);
+temp_lat_carter_shifted(21:end,:) = temp_lat_carter(1:340,:);
+
+temp_o2_carter_shifted(1:20,:) = temp_carter_o2(341:end,:);
+temp_o2_carter_shifted(21:end,:) = temp_carter_o2(1:340,:);
+
+temp_no3_carter_shifted(1:20,:) = temp_carter_no3(341:end,:);
+temp_no3_carter_shifted(21:end,:) = temp_carter_no3(1:340,:);
+%
+set(gcf, 'colormap', turbo(50))
+clf
+subplot(3,2,1)
+pcolor(carter.lon_grid, carter.lat_grid, carter.pO(:,:,depth_index)'); shading flat; colorbar
+
+
+
+subplot(3,2,2)
+pcolor(argo_MLD.LON, argo_MLD.LAT, argo_MLD.wint_mean); shading flat; colorbar
+
+subplot(3,2,3)
+pcolor(temp_lon_carter, temp_lat_carter, temp_carter_o2); shading flat; colorbar
+
+subplot(3,2,4)
+pcolor(temp_lon_carter_shifted, temp_lat_carter_shifted, temp_o2_carter_shifted); shading flat; colorbar
+
+
+samw_index_pac = argo_MLD.wint_mean>=MLD_cutoff & argo_MLD.LON>=geo_lims.pac_lims(1) & argo_MLD.LON<=geo_lims.pac_lims(2) ...
+    & argo_MLD.LAT>=geo_lims.lat_lims_pac(1) & argo_MLD.LAT<=geo_lims.lat_lims_pac(2);
+
+temp_o2_carter_pac = temp_o2_carter_shifted;
+temp_o2_carter_pac(~samw_index_pac)=nan;
+
+temp_no3_carter_pac = temp_no3_carter_shifted;
+temp_no3_carter_pac(~samw_index_pac)=nan;
+
+
+subplot(3,2,5)
+pcolor(temp_lon_carter_shifted, temp_lat_carter_shifted, temp_o2_carter_pac); shading flat; colorbar
+
+
+samw_index_ind = argo_MLD.wint_mean>=MLD_cutoff & argo_MLD.LON>=geo_lims.ind_lims(1) & argo_MLD.LON<=geo_lims.ind_lims(2) ...
+    & argo_MLD.LAT>=geo_lims.lat_lims_ind(1) & argo_MLD.LAT<=geo_lims.lat_lims_ind(2);
+
+temp_o2_carter_ind = temp_o2_carter_shifted;
+temp_o2_carter_ind(~samw_index_ind)=nan;
+
+temp_no3_carter_ind = temp_no3_carter_shifted;
+temp_no3_carter_ind(~samw_index_ind)=nan;
+
+subplot(3,2,6)
+pcolor(temp_lon_carter_shifted, temp_lat_carter_shifted, temp_o2_carter_ind); shading flat; colorbar
+
+disp('depth')
+disp(carter.Depth(depth_index))
+disp('O2 Pac')
+disp(nanmean(reshape(temp_o2_carter_pac,[],1)))
+disp(nanstd(reshape(temp_o2_carter_pac,[],1)))
+
+disp('O2 Ind')
+disp(nanmean(reshape(temp_o2_carter_ind,[],1)))
+disp(nanstd(reshape(temp_o2_carter_ind,[],1)))
+
+disp('no3 Pac')
+disp(nanmean(reshape(temp_no3_carter_pac,[],1)))
+disp(nanstd(reshape(temp_no3_carter_pac,[],1)))
+
+disp('no3 Ind')
+disp(nanmean(reshape(temp_no3_carter_ind,[],1)))
+disp(nanstd(reshape(temp_no3_carter_ind,[],1)))%%
+

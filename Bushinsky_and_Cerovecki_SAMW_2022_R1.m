@@ -6,7 +6,7 @@
 %
 % Corresponding author: Seth Bushinsky (seth.bushinsky@hawaii.edu)
 
-%% Load data:
+% %% Load data:
 
 % Load float data
 float_data_dir = [data_dir 'ARGO_O2_Floats/Global/SOCCOM/2021_05_05_Snapshot_LoRes_LIAR/'];
@@ -80,7 +80,7 @@ disp('loading socat')
 % socat = load([home_dir 'Data/Data_Products/SOCAT/v2020/SOCATv2020_SouthernOceans_ABCD.mat']);
 socat = load([data_dir 'Data_Products/SOCAT/v2021/SOCATv2021_SouthernOceans_ABCD_WOCE_2.mat']);
 
-%% Calculate SLP climatology and calculate delta pCO2 for all datasets
+% %% Calculate SLP climatology and calculate delta pCO2 for all datasets
 
 disp('Calculating 10-yr SLP climatology')
 
@@ -409,7 +409,7 @@ socat.delta_pCO2_unified = socat.calc_pCO2 - socat.pC_moist_atmosphere;
 clear pH2O pC_moist_atmosphere pC_dry_atmosphere decile_count date_index lat_index temp_date_vec temp_lats temp_lons temp_lats_nearest_pt5 temp_lons_nearest_pt5
 clear noaa_co2_dir noaa_co2_filename noaa_co2 decile_vec gdap_fields_w_flags gdap_fields_no_flags press_dates press_year_day select_seasonal_press total_lat_lon_list
 
-%%  Get all float data into two bins - Pacific and Indian
+% %%  Get all float data into two bins - Pacific and Indian
 % only criteria for separation is longitude
 % eventually will create "store_argo", "store_gdap", "store_socat", which
 % have all property observations in vectors/arrays (for 2d data) separated
@@ -558,7 +558,7 @@ end
 
 clear r daily_flag parameters_1D parameters_2D p2 bad_flag
 
-%% ML calculations for shipboard data
+% %% ML calculations for shipboard data
 disp('socat ML calculations')
 % load gridded Argo-derived MLDs and perform calculations on Glodap and Socat
 % used for Figure 1
@@ -691,7 +691,7 @@ end
 disp('Gdap ML calcs done')
 
 clear temp_T_0 temp_S_0 temp_P_0 temp_T temp_S temp_P temp_MLD temp_var p1 c s cruise_index station_numbers cruise_numbers press_dates press_year_day station_index stations_per_cruise
-%% put shipboard data into regions
+% %% put shipboard data into regions
 disp('Separating shipboard data into regions')
 % only criteria for separation is longitude
 
@@ -796,7 +796,7 @@ clear r
 clear parameter_list parameter_list_2D socat_para gdap_para
 disp('Done')
 
-%% load mode water volumes
+% %% load mode water volumes
 % volumes are stored in 0.05 bins 
 
 past_final_year = '2021'; 
@@ -1127,7 +1127,8 @@ for r = 1:length(regions)
 end
 clear r
 
-%% Carter et al. 2014 comparison:
+
+% %% Carter et al. 2014 comparison:
 % Use nitrate difference and redfield to estimate equivalent DIC and Alk
 % differences and calculate a new pCO2
 
