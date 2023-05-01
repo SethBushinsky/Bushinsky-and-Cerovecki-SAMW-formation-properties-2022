@@ -957,10 +957,10 @@ for r = 1:2
     q = 2; % delta pCO2
     disp(properties{props_out(q)})
     
-    out_delt_o2_pCO2_mean(r, 25) = nanmean([temp_filt.(regions{r}).(data_sources{1}).(properties{props_out(q)})(:,1) ; ...
+    out_delt_o2_pCO2_mean(r, 25) = nanmean([temp_filt.(regions{r}).(data_sources{1}).(properties{props_out(q)})(:,1); ...
         temp_filt.(regions{r}).(data_sources{3}).(properties{props_out(q)})(:,1)]);
     
-    out_delt_o2_pCO2_std(r, 25) = nanstd([temp_filt.(regions{r}).(data_sources{1}).(properties{props_out(q)})(:,1) ; ...
+    out_delt_o2_pCO2_std(r, 25) = nanstd([temp_filt.(regions{r}).(data_sources{1}).(properties{props_out(q)})(:,1); ...
         temp_filt.(regions{r}).(data_sources{3}).(properties{props_out(q)})(:,1)]);
     
     
@@ -1900,7 +1900,7 @@ for f =  1:length(SO_SNs)
             socat_dist = distance('gc',Argo.(SO_SNs{f}).Lat(p), lon_temp_argo, socat.latitude(time_match), lon_temp_socat).*111.19; % distance in km
             
             if sum(socat_dist<=distance_range)
-                disp(p)
+%                 disp(p)
                 
                 
                 Argo_socat_dist.(SO_SNs{f}).mean_dist(end+1,1) = nanmean(socat_dist(socat_dist<distance_range));
@@ -2136,7 +2136,7 @@ disp(['Green: remove > ' num2str(density_threshold) 'kg/m3 diff. Mean filtered: 
 disp( ['original n: ' num2str(sum(~isnan(socat_minus_argo))) ' ' ...
     'filtered n: ' num2str(sum(~isnan(diff_filtered_dens_difference)))])
 
-print(gcf,'-dpdf', '-r800', [plot_dir plot_filename 'density_comp ' num2str(density_threshold) '.pdf'])
+% print(gcf,'-dpdf', '-r800', [plot_dir plot_filename 'density_comp ' num2str(density_threshold) '.pdf'])
 
 
 clear d2 h2 orig_x_lim d1
